@@ -3,8 +3,7 @@ import { Layout, Button, List } from 'antd'
 import { DownloadOutlined } from '@ant-design/icons'
 
 const config = {
-  apiUrl: 'https://type.fit/api/quotes',
-  repoUrl: 'https://github.com/ssokurenko/quotes-react-app'
+  apiUrl: 'https://type.fit/api/quotes'
 }
 
 const { Header, Content } = Layout
@@ -56,7 +55,6 @@ function App() {
               Fetch Quotes
             </Button>
           }
-          footer={<a href={config.repoUrl}>Fork on Github</a>}
           bordered
           dataSource={quotes}
           renderItem={(quote) => (
