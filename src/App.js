@@ -1,45 +1,73 @@
-// src/App.js
-import React, { useEffect, useState } from "react";
-import Quote from "./Quote";
-import "./App.css";
+import React, { useState } from 'react'
+import { Layout, Button, List } from 'antd'
+import { DownloadOutlined } from '@ant-design/icons'
 
-const App = () => {
-  const [quotes, setQuotes] = useState([]);
-  const [currentQuote, setCurrentQuote] = useState({});
+const config = {
+  apiUrl: 'https://type.fit/api/quotes',
+  repoUrl: 'https://github.com/ssokurenko/quotes-react-app'
+}
 
-  useEffect(() => {
-    // Fetch quotes when the component mounts
-    fetch("https://type.fit/api/quotes")
-      .then((response) => response.json())
-      .then((data) => {
-        setQuotes(data);
-        getRandomQuote(data);
+const { Header, Content } = Layout
+
+function App() {
+  const [quotes, setQuotes] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const Quote = ({ text, author }) => {
+    return (
+      <span>
+        <strong>{text}</strong> &nbsp; <span>{author}</span>
+      </span>
+    )
+  }
+
+  const getQuotes = () => {
+    setQuotes([])
+    setIsLoading(true)
+    fetch(config.apiUrl)
+      .then(function (response) {
+        return response.json()
       })
-      .catch((error) => console.error("Error fetching quotes:", error));
-  }, []);
-
-  // Get a random quote from the list
-  const getRandomQuote = (quotesList) => {
-    const randomIndex = Math.floor(Math.random() * quotesList.length);
-    setCurrentQuote(quotesList[randomIndex]);
-  };
-
-  // Handle click event to get a new quote
-  const handleNewQuote = () => getRandomQuote(quotes);
-
+      .then((data) => {
+        setQuotes(data)
+        setIsLoading(false)
+      })
+      .catch(() => {
+        setIsLoading(false)
+      })
+  }
   return (
-    <div className="container">
-      <header className="site-logo">Quote Generator</header>
-      <main>
-        {currentQuote && (
-          <Quote quote={currentQuote.text} author={currentQuote.author} />
-        )}
-        <button onClick={handleNewQuote} className="new-quote-button">
-          New Quote
-        </button>
-      </main>
-    </div>
-  );
-};
+    <Layout>
+      <Header>
+        <div className="container">
+          <span className="site-logo">Inspirational Quotes</span>
+        </div>
+      </Header>
+      <Content className="container">
+        <List
+          size="small"
+          loading={isLoading}
+          header={
+            <Button
+              onClick={() => getQuotes()}
+              type="primary"
+              icon={<DownloadOutlined />}
+              disabled={isLoading}
+              size="large">
+              Fetch Quotes
+            </Button>
+          }
+          footer={<a href={config.repoUrl}>Fork on Github</a>}
+          bordered
+          dataSource={quotes}
+          renderItem={(quote) => (
+            <List.Item>
+              <Quote text={quote.text} author={quote.author} />
+            </List.Item>
+          )}
+        />
+      </Content>
+    </Layout>
+  )
+}
 
-export default App;
+export default App
